@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Test</title>
+
+
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>    
+	<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>    
+	<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.70.0/dist/L.Control.Locate.min.css" />
+ 
+<script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.70.0/dist/L.Control.Locate.min.js" charset="utf-8"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>     
+<script src="https://unpkg.com/leaflet.featuregroup.subgroup@1.0.2/dist/leaflet.featuregroup.subgroup.js"></script>
+<style>
+
+
+
+#map1 {  position: absolute;
+width: 100%;
+height: 100%;
+overflow: hidden;}
+
+.cluster {
+    background: #3498db;
+    border-radius: 50%;
+    text-align: center;
+    color: white;
+    font-weight: 700;
+    border: 1px solid #3498db;
+    font-family: monospace;
+}
+.cluster:before {
+    content: ' ';
+    position: absolute;
+    border-radius: 50%;
+    z-index: -1;
+    top: 1px;
+    left: 1px;
+    right: 1px;
+    bottom: 1px;
+    border: 1px solid white;
+}
+.digits-1 {
+    font-size: 14px;
+    height: 28px;
+    width: 28px;
+    line-height: 28px;
+    margin-top: -14px;
+    margin-left: -14px;
+}
+.digits-2 {
+    font-size: 16px;
+    height: 34px;
+    width: 34px;
+    line-height: 35px;
+    margin-top: -17px;
+    margin-left: -17px;
+}
+.digits-2:before {
+    border-width: 2px;
+}
+.digits-3 {
+    font-size: 18px;
+    height: 48px;
+    width: 47px;
+    line-height: 47px;
+    border-width: 3px;
+    margin-top: -24px;
+    margin-left: -24px;
+}
+.digits-3:before {
+    border-width: 3px;
+}
+.digits-4 {
+    font-size: 18px;
+    height: 58px;
+    width: 58px;
+    line-height: 57px;
+    border-width: 4px;
+    margin-top: -29px;
+    margin-left: -29px;
+}
+.digits-4:before {
+    border-width: 4px;
+}
+
+
+
+
+
+
+
+
+</style>
+
+
+</head>
+
+<body>
+
+
+
+ <div id="map1"></div>
+    <script>var mymap = L.map('map1').setView([48.86198,2.33967], 13);
+
+L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+    maxZoom: 18,
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    id: 'mapbox.streets'
+}).addTo(mymap);
+
+L.control.locate().addTo(mymap);
+ 
+  var geocoder = L.Control.geocoder({
+  defaultMarkGeocode: false
+}).on('markgeocode', function(e) {
+    var bbox = e.geocode.bbox;
+    var poly = L.polygon([bbox.getSouthEast(),bbox.getNorthEast(),bbox.getNorthWest(),bbox.getSouthWest()]);
+    mymap.fitBounds(poly.getBounds());
+  }).addTo(mymap);
+  
+
+
+
+function createPopupContent(feature) {
+     html="<b>"+feature.properties.EquNom+"</b><br><br>"
+		
+	html += '<span>Ville:</span>' + feature.properties.ComLib;
+	html += '<br><span>Departement:</span>' + feature.properties.DepCode;
+	html += '<br><a>Plus d\'infos</a>';
+	
+return html; 
+}
+
+
+var parentGroup = new L.markerClusterGroup({
+	showCoverageOnHover: false,
+	maxClusterRadius:100,
+    iconCreateFunction: function(cluster) {
+        var digits = (cluster.getChildCount()+'').length;
+        return L.divIcon({ 
+            html: cluster.getChildCount(), 
+            className: 'cluster digits-'+digits,
+            iconSize: null 
+        });
+    }
+}).addTo(mymap);
+var subs = {};
+
+var  control= L.control.layers(null, null).addTo(mymap);
+
+
+fetch("https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/valbronx/EQUIP/master/convertcsv(2).geojson")
+  .then(function (response) { console.log(response);
+  return response.json() })
+  .then(function (data) {
+    var categories = new Set();
+    
+	for (var i in data.features) {
+      var feature = data.features[i];
+      categories.add(feature.properties.DepCode);
+    }
+    
+    categories.forEach(function(category) {
+      var sub=L.featureGroup.subGroup(parentGroup).addTo(mymap);
+      var layer = L.geoJSON(data, {
+        filter: function(f){ if (f.properties.DepCode === category) return true; },
+		pointToLayer: function (feature, latlng) {
+			 var smallIcon = new L.Icon({
+			 iconSize: [27, 27],
+			 iconAnchor: [13, 27],
+			 popupAnchor:  [1, -24],
+			 iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Soccer-ball_%28example%29.svg/1200px-Soccer-ball_%28example%29.svg.png'
+			 });
+        return L.marker(latlng, {icon: smallIcon}).bindPopup(createPopupContent(feature));
+	  }}).addTo(sub);
+	control.addOverlay(sub, category);
+  })  
+  });
+ </script> 
+
+
+</body>
+
+</html>
