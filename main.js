@@ -183,6 +183,8 @@ var deps=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
        83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 971, 972, 973,
        974, 975, 976, 977, 978, 986, 987, 988];
 	   
+var deps=[ 75, 76, 77, 78,91, 92, 93, 94, 95];
+	   
 var urls=[];
 deps.forEach(function(dep){
 	urls.push("https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/valbronx/EQUIP/master/cleaning/departements/"+dep.toString()+".geojson");
